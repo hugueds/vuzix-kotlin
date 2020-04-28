@@ -25,8 +25,6 @@ class OperationResult {
             this.errorPicture = errorPicture
     }
 
-
-
     constructor(result:Int, operationId: Int, chassis: String, errorPicture: Bitmap) {
         // Convert a Bitmap Image to a Base64 String
     }
