@@ -9,17 +9,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:background="@color/black"
-        />
+        android:layout_height="50dp"
+        android:background="@color/black" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
         android:textAlignment="center"
-        android:textSize="35sp"
+        android:textSize="33sp"
         android:text="PRESSIONE O BOTÃO POSTERIOR \nPARA LER CÓDIGO DE BARRAS \n DO VEICULO NO POSTO DE MONTAGEM" />
 
     <Button

@@ -12,11 +12,6 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface Endpoint {
-
     @POST("vuzix")
     fun createOperationResult(@Body body: List<OperationResult>): retrofit2.Call<OperationResultResponse>
-
-
-
-
 }

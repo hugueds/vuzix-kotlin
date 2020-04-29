@@ -29,6 +29,15 @@ class OperationResult {
         // Convert a Bitmap Image to a Base64 String
     }
 
+    override fun toString(): String {
+        return """
+            OPERATION ID -> $operationId
+            RESULT -> $result
+            CHASSI -> $chassi
+            DATETIME -> $dateTime
+        """.trimIndent()
+    }
+
 }
 
 data class OperationResultResponse( val error: Boolean,  val message: String )

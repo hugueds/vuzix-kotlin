@@ -1,6 +1,8 @@
 package com.scania.vuzixquality.utils
 
+import android.content.Context
 import android.content.ContextWrapper
+import android.util.Log
 import android.widget.Toast
 import com.scania.vuzixquality.model.Endpoint
 import com.scania.vuzixquality.model.OperationResult
@@ -14,19 +16,25 @@ class OperationLogger() {
 
     companion object {
 
-        fun save(results: List<OperationResult>, submit: Boolean = false) {
+        fun save(results: List<OperationResult>, context: Context) {
+
+            // TODO Store data in SQLite DB
+            Toast.makeText(context, "RESULTADOS SALVOS COM SUCESSO", Toast.LENGTH_LONG).show()
+            for (r in results) {
+                Log.i("RESULT", r.toString())
+            }
 
         }
 
         fun submit(context: ContextWrapper, server: String = "", results: List<OperationResult>) {
 
             val client = NetworkUtils.getRetrofitInstance(server)
-            val a = client.create(Endpoint::class.java)
+            val endpoint = client.create(Endpoint::class.java)
 
-
-            a.createOperationResult(results).enqueue(object : Callback<OperationResultResponse> {
+            endpoint.createOperationResult(results).enqueue(object : Callback<OperationResultResponse> {
 
                 override fun onFailure(call: Call<OperationResultResponse>, t: Throwable) {
+                    Log.e("SUBMIT", t.toString())
                     Toast.makeText(context, t.message, Toast.LENGTH_LONG).show()
                 }
 

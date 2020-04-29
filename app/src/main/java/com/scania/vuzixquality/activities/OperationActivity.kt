@@ -3,12 +3,15 @@ package com.scania.vuzixquality.activities
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Base64
 
 import android.util.Log
@@ -26,11 +29,13 @@ import com.scania.vuzixquality.repository.OperationLoader
 class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
     private var locked = false
+    private val animationTime: Long = 750
     private lateinit var operationController: OperationController
     private val mView = this
-    //    private val receiver: VoiceCmdReceiver = VoiceCmdReceiver(mView)
+    private val REQUEST_IMAGE_CAPTURE = 1
+
     // TODO Implement Voice Controller
-    // TODO Enable buttons or not via connfig
+    // TODO Enable buttons or not via config
 
     //    val cameraStateCallbacks =  Camera
 
@@ -43,13 +48,31 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
         val size = operationController.totalOperations
         val stringPicture = operationController.currentOperationTask.picture
 
-
         text_current_operation.text = "${index + 1} / $size"
         text_operation_name.text = operationTask
 
         layout_operation.setBackgroundColor(Color.BLACK)
 
         image_view_operation.setImageBitmap(loadImage(stringPicture))
+    }
+
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                startActivityForResult(takePictureIntent, 1888)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        Log.i("RESULT", "HAS HAPPENED")
+
+        if (resultCode == Activity.RESULT_OK) {
+            Log.i("OK", data.toString())
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
 
@@ -149,6 +172,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             }
             KeyEvent.KEYCODE_DEL -> {
                 this.animateBackground(Color.RED)
+                dispatchTakePictureIntent()
                 operationController.updateOperation(updateTasks, 2)
             }
             KeyEvent.KEYCODE_FORWARD_DEL -> {
@@ -177,7 +201,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun animateBackground(color: Int) {
-        val animationTime: Long = 750
+
         ObjectAnimator.ofObject(
             layout_operation, "backgroundColor", ArgbEvaluator(),
             Color.BLACK, color

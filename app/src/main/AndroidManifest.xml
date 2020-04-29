@@ -16,7 +16,7 @@
         android:screenOrientation="sensorLandscape"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.CameraActivity"></activity>
+        <activity android:name=".activities.CameraActivity" />
         <activity
             android:name=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
