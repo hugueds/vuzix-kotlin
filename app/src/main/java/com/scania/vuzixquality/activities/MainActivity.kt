@@ -13,12 +13,14 @@ import com.scania.vuzixquality.utils.OperationLogger
 import com.scania.vuzixquality.utils.VoiceController
 import com.vuzix.sdk.barcode.ScannerIntent
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
     private val REQUEST_CODE_SCAN = 0
     lateinit var voiceController: VoiceController
     private val server = "http://192.168.1.16:5000/"
+    private val DEVICE_TYPE = 0 // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
 
     // TODO Create preferences Class
     // TODO Load preferences
@@ -39,15 +41,23 @@ class MainActivity : AppCompatActivity() {
         voiceController = VoiceController(this)
 
         button.setOnClickListener {
-            val intent = Intent(ScannerIntent.ACTION)
-            startActivityForResult(intent, REQUEST_CODE_SCAN)
+
+            if (DEVICE_TYPE == 1) {
+                navigate()
+            }
+
+            try {
+                val intent = Intent(ScannerIntent.ACTION)
+                startActivityForResult(intent, REQUEST_CODE_SCAN)
+            } catch (e: Exception) {
+                Log.e("VUZIX", e.toString())
+            }
+
         }
 
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        val context = this
 
         when (requestCode) {
 
@@ -58,10 +68,7 @@ class MainActivity : AppCompatActivity() {
                     val resultString =
                         data?.getStringExtra(ScannerIntent.RESULT_EXTRA_BARCODE_TEXT);
                     // TODO Chassis Number Validation
-                    val intent = Intent(context, OperationActivity::class.java).apply {
-                        putExtra("CHASSIS", resultString)
-                    }
-                    startActivity(intent)
+                    navigate(resultString)
                 }
 
             }
@@ -76,10 +83,7 @@ class MainActivity : AppCompatActivity() {
 
             KeyEvent.KEYCODE_1 -> { // Skip Barcode reader
                 if (event.action == KeyEvent.ACTION_UP) {
-                    val intent = Intent(this, OperationActivity::class.java).apply {
-                        putExtra("CHASSIS", "9999999")
-                    }
-                    startActivity(intent)
+                    navigate("")
                 }
             }
 
@@ -96,12 +100,17 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
             }
-
-
         }
 
 
         return super.dispatchKeyEvent(event)
+    }
+
+
+    private fun navigate(resultString: String? = "999999") {
+        val intent = Intent(this, OperationActivity::class.java)
+        intent.putExtra("CHASSIS", resultString)
+        startActivity(intent)
     }
 
 

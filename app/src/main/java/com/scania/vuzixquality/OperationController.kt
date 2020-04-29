@@ -50,11 +50,11 @@ class OperationController {
 
         this.locked = true
 
-        if (this.indexOperation < totalOperations - 1) {
+        operationResults.add(OperationResult(
+            status,currentOperationTask.id, chassi!!, null)
+        )
 
-            operationResults.add(OperationResult(
-                status,currentOperationTask.id, chassi!!, null)
-            )
+        if (this.indexOperation < totalOperations - 1) {
 
             this.indexOperation += 1
             this.currentOperationTask.status = status
@@ -70,8 +70,8 @@ class OperationController {
 
                 override fun onTick(millisUntilFinished: Long) {}
             }
-            timer.start()
 
+            timer.start()
 
         } else {
             Log.i("OperationController", "All operations Done")
@@ -92,7 +92,7 @@ class OperationController {
         val timer = object : CountDownTimer(OPERATION_TIME, OPERATION_TIME) {
 
             override fun onFinish() {
-                OperationLogger.save(operationResults)
+                OperationLogger.save(operationResults, mView.applicationContext)
                 mView.finish()
             }
 
