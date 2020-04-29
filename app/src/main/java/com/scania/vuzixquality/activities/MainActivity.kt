@@ -19,14 +19,13 @@ class MainActivity : AppCompatActivity() {
 
     private val REQUEST_CODE_SCAN = 0
     lateinit var voiceController: VoiceController
-    private val server = "http://192.168.1.16:5000/"
-    private val DEVICE_TYPE = 0 // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
+    private val server = "http://10.33.22.113:8080"
+    private val DEVICE_TYPE = 1 // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
 
     // TODO Create preferences Class
     // TODO Load preferences
     // TODO Enable buttons or not by preferences
     // TODO Create a preferences menu in Main
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,14 +59,15 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
         when (requestCode) {
-
             REQUEST_CODE_SCAN -> {
-
                 if (resultCode == Activity.RESULT_OK) {
                     Log.i("SCAN", "SCAN OK")
                     val resultString =
                         data?.getStringExtra(ScannerIntent.RESULT_EXTRA_BARCODE_TEXT);
-                    // TODO Chassis Number Validation
+                    // TODO Use RegEx for validate the numbers
+                    if (resultString?.length!! < 7) {
+                        Log.i("SCANNER", "INVALID SIZE")
+                    }
                     navigate(resultString)
                 }
 

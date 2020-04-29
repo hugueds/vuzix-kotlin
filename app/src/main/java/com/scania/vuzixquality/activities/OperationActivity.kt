@@ -28,14 +28,13 @@ import com.scania.vuzixquality.repository.OperationLoader
 
 class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
-    private var locked = false
-    private val animationTime: Long = 750
+    // TODO Enable buttons or not via config
+
+    private val animationTime: Long = 750 // CONFIG FILE
     private lateinit var operationController: OperationController
-    private val mView = this
     private val REQUEST_IMAGE_CAPTURE = 1
 
-    // TODO Implement Voice Controller
-    // TODO Enable buttons or not via config
+
 
     //    val cameraStateCallbacks =  Camera
 
@@ -90,26 +89,10 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
         val operations = OperationLoader.json(this.applicationContext)
 
-        operationController =
-            OperationController(this, operations)
+        operationController = OperationController(this, operations)
         operationController.updateOperation(0, updateTasks)
 
         text_chassi.text = operationController.chassi
-
-//        AlertDialog.Builder(this)
-//            .setTitle("Take a Picture")
-//            .setMessage("B")
-//            .setPositiveButton("SIM") { dialog: DialogInterface, which: Int ->
-//                dialog.dismiss()
-//                // val intent = Intent(this, _CameraActivity::class.java)
-//                // startActivity(intent)
-//            }
-//            .setNeutralButton("NÃO") { _, _ -> }
-//            .show()
-//            .getButton(AlertDialog.BUTTON_POSITIVE)
-//            .requestFocus()
-
-
         registerListeners()
 
     }

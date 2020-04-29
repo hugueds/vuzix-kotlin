@@ -13,6 +13,7 @@ import retrofit2.Response
 
 class OperationLogger() {
 
+    // TODO Load server from config
 
     companion object {
 
@@ -24,9 +25,11 @@ class OperationLogger() {
                 Log.i("RESULT", r.toString())
             }
 
+            this.submit(context, "http://10.33.22.113:8080", results)
+
         }
 
-        fun submit(context: ContextWrapper, server: String = "", results: List<OperationResult>) {
+        fun submit(context: Context, server: String = "http://10.33.22.113:8080", results: List<OperationResult>) {
 
             val client = NetworkUtils.getRetrofitInstance(server)
             val endpoint = client.create(Endpoint::class.java)
