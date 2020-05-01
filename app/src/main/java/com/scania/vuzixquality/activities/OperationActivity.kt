@@ -36,8 +36,31 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
     // TODO Implement Voice Controller
     // TODO Enable buttons or not via config
-
     //    val cameraStateCallbacks =  Camera
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        supportActionBar?.hide()
+//        window.setFlags(
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN
+//        )
+
+        setContentView(R.layout.activity_operation)
+
+        val operations = OperationLoader.json(this.applicationContext)
+
+        operationController =
+            OperationController(this, operations)
+        operationController.updateOperation(0, updateTasks)
+
+        text_chassi.text = operationController.chassi
+
+        registerListeners()
+
+    }
 
     // On Click, On Voice or On Key, add 1 to index and load the next picture
     @SuppressLint("SetTextI18n")
@@ -52,66 +75,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
         text_operation_name.text = operationTask
 
         layout_operation.setBackgroundColor(Color.BLACK)
-
         image_view_operation.setImageBitmap(loadImage(stringPicture))
-    }
-
-    private fun dispatchTakePictureIntent() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(packageManager)?.also {
-                startActivityForResult(takePictureIntent, 1888)
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        Log.i("RESULT", "HAS HAPPENED")
-
-        if (resultCode == Activity.RESULT_OK) {
-            Log.i("OK", data.toString())
-        }
-
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-
-        super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        supportActionBar?.hide()
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
-
-        setContentView(R.layout.activity_operation)
-
-        val operations = OperationLoader.json(this.applicationContext)
-
-        operationController =
-            OperationController(this, operations)
-        operationController.updateOperation(0, updateTasks)
-
-        text_chassi.text = operationController.chassi
-
-//        AlertDialog.Builder(this)
-//            .setTitle("Take a Picture")
-//            .setMessage("B")
-//            .setPositiveButton("SIM") { dialog: DialogInterface, which: Int ->
-//                dialog.dismiss()
-//                // val intent = Intent(this, _CameraActivity::class.java)
-//                // startActivity(intent)
-//            }
-//            .setNeutralButton("NÃO") { _, _ -> }
-//            .show()
-//            .getButton(AlertDialog.BUTTON_POSITIVE)
-//            .requestFocus()
-
-
-        registerListeners()
-
     }
 
     fun update() {
@@ -172,7 +136,6 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             }
             KeyEvent.KEYCODE_DEL -> {
                 this.animateBackground(Color.RED)
-                dispatchTakePictureIntent()
                 operationController.updateOperation(updateTasks, 2)
             }
             KeyEvent.KEYCODE_FORWARD_DEL -> {
@@ -186,7 +149,6 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
                 Log.i("KEY", "NUMBER 1")
                 operationController.reset(updateTasks)
             }
-
 
         }
 

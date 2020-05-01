@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_CODE_SCAN = 0
     lateinit var voiceController: VoiceController
     private val server = "http://192.168.1.16:5000/"
-    private val DEVICE_TYPE = 0 // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
+    private val DEVICE_TYPE = 2 // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
 
     // TODO Create preferences Class
     // TODO Load preferences
@@ -33,16 +33,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
+//        window.setFlags(
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN
+//        )
 
         voiceController = VoiceController(this)
 
         button.setOnClickListener {
 
-            if (DEVICE_TYPE == 1) {
+            if (DEVICE_TYPE == 2) {
                 navigate()
             }
 

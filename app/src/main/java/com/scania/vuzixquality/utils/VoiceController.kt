@@ -45,7 +45,7 @@ class VoiceController {
         sc.insertWakeWordPhrase("vuzix")
 
         // praaxymoo praaxymow saertow saertoo
-        // voow thar voo thar
+        // voow thar voo thar thees view
 
         sc.insertKeycodePhrase("okay", KeyEvent.KEYCODE_FORWARD_DEL)
         sc.insertKeycodePhrase("praaxymoo", KeyEvent.KEYCODE_FORWARD_DEL)
@@ -54,8 +54,9 @@ class VoiceController {
         sc.insertKeycodePhrase("saertoo", KeyEvent.KEYCODE_FORWARD_DEL)
 
 
+//        sc.insertKeycodePhrase("not okay", KeyEvent.KEYCODE_DEL)
+        sc.insertKeycodePhrase("thees view", KeyEvent.KEYCODE_DEL)
 
-        sc.insertKeycodePhrase("not okay", KeyEvent.KEYCODE_DEL)
         sc.insertKeycodePhrase("error", KeyEvent.KEYCODE_DEL)
 
     }
