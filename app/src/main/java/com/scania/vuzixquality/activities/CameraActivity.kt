@@ -252,8 +252,8 @@ class CameraActivity : AppCompatActivity() {
             mPreviewRequestBuilder.addTarget(surface)
 
             // Here, we create a CameraCaptureSession for camera preview.
-            mCameraDevice!!.createCaptureSession(
-                Arrays.asList(surface, mImageReader!!.surface),
+            mCameraDevice.createCaptureSession(
+                listOf(surface, mImageReader.surface),
                 object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
                         // The camera is already closed

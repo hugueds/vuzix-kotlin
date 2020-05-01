@@ -17,10 +17,13 @@ class VoiceController {
 
     lateinit var sc: VuzixSpeechClient
 
+    lateinit var activity: Activity
+
     constructor(activity: AppCompatActivity) {
 
         try {
-            VuzixSpeechClient.EnableRecognizer(activity.applicationContext, true)
+            this.activity = activity
+            VuzixSpeechClient.EnableRecognizer(this.activity.applicationContext, true)
             sc = VuzixSpeechClient(activity)
             this.registerPhrases()
             Toast.makeText(activity.applicationContext, "VOICE IS ACTIVE", Toast.LENGTH_LONG).show()
@@ -39,7 +42,8 @@ class VoiceController {
 
     }
 
-    fun registerPhrases() {
+    private fun registerPhrases() {
+
         sc.insertWakeWordPhrase("hello")
         sc.insertWakeWordPhrase("start")
         sc.insertWakeWordPhrase("vuzix")
@@ -56,6 +60,10 @@ class VoiceController {
 
 //        sc.insertKeycodePhrase("not okay", KeyEvent.KEYCODE_DEL)
         sc.insertKeycodePhrase("thees view", KeyEvent.KEYCODE_DEL)
+        sc.insertKeycodePhrase("theesview", KeyEvent.KEYCODE_DEL)
+        sc.insertKeycodePhrase("this viel", KeyEvent.KEYCODE_DEL)
+        sc.insertKeycodePhrase("thisviel", KeyEvent.KEYCODE_DEL)
+
 
         sc.insertKeycodePhrase("error", KeyEvent.KEYCODE_DEL)
 

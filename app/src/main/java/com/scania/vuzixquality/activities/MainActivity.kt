@@ -68,7 +68,8 @@ class MainActivity : AppCompatActivity() {
                     val resultString =
                         data?.getStringExtra(ScannerIntent.RESULT_EXTRA_BARCODE_TEXT);
                     // TODO Chassis Number Validation
-                    navigate(resultString)
+                    if (resultString != "" || resultString.length < 7)
+                        navigate(resultString)
                 }
 
             }

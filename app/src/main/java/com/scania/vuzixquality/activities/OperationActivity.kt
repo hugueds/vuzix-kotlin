@@ -25,6 +25,7 @@ import com.scania.vuzixquality.R
 import kotlinx.android.synthetic.main.activity_operation.*
 
 import com.scania.vuzixquality.repository.OperationLoader
+import com.scania.vuzixquality.utils.VoiceController
 
 class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -33,6 +34,9 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var operationController: OperationController
     private val mView = this
     private val REQUEST_IMAGE_CAPTURE = 1
+
+    lateinit var voiceController: VoiceController
+
 
     // TODO Implement Voice Controller
     // TODO Enable buttons or not via config
@@ -49,6 +53,8 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
 //        )
 
         setContentView(R.layout.activity_operation)
+
+        voiceController = VoiceController(this)
 
         val operations = OperationLoader.json(this.applicationContext)
 
