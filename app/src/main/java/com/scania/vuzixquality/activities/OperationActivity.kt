@@ -3,29 +3,25 @@ package com.scania.vuzixquality.activities
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Base64
 
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.Window
-import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import com.scania.vuzixquality.OperationController
+import com.scania.vuzixquality.controllers.OperationController
 import com.scania.vuzixquality.R
 import kotlinx.android.synthetic.main.activity_operation.*
 
 import com.scania.vuzixquality.repository.OperationLoader
-import com.scania.vuzixquality.utils.VoiceController
+import com.scania.vuzixquality.controllers.VoiceController
 
 class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -40,26 +36,26 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
     // TODO Implement Voice Controller
     // TODO Enable buttons or not via config
-    //    val cameraStateCallbacks =  Camera
+    // val cameraStateCallbacks =  Camera
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         supportActionBar?.hide()
-//        window.setFlags(
-//            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//            WindowManager.LayoutParams.FLAG_FULLSCREEN
-//        )
 
         setContentView(R.layout.activity_operation)
 
-        voiceController = VoiceController(this)
+        voiceController =
+            VoiceController(this)
 
         val operations = OperationLoader.json(this.applicationContext)
 
         operationController =
-            OperationController(this, operations)
+            OperationController(
+                this,
+                operations
+            )
         operationController.updateOperation(0, updateTasks)
 
         text_chassi.text = operationController.chassi

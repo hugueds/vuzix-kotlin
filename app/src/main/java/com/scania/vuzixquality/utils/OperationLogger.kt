@@ -4,12 +4,21 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.util.Log
 import android.widget.Toast
-import com.scania.vuzixquality.model.Endpoint
 import com.scania.vuzixquality.model.OperationResult
 import com.scania.vuzixquality.model.OperationResultResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
+
+interface Endpoint {
+    @POST("vuzix")
+    fun createOperationResult(@Body body: List<OperationResult>): retrofit2.Call<OperationResultResponse>
+}
 
 class OperationLogger() {
 

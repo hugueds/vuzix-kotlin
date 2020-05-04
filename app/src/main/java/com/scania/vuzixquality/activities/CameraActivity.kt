@@ -48,6 +48,7 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var mPreviewRequestBuilder: CaptureRequest.Builder
     private var mPreviewRequest: CaptureRequest? = null
     private val mCameraOpenCloseLock: Semaphore = Semaphore(1)
+    private lateinit var file: File
     private val REQUEST_CAMERA_PERMISSION = 1
 
     private val ORIENTATIONS: SparseIntArray = SparseIntArray()
@@ -108,10 +109,14 @@ class CameraActivity : AppCompatActivity() {
 
         mTextureView = texture
 
+        file = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+            "pic.jpg"
+        )
+
         btn_takepicture.setOnClickListener() {
             takePicture()
         }
-
 
     }
 
@@ -124,10 +129,6 @@ class CameraActivity : AppCompatActivity() {
         super.onResume()
         startBackgroundThread()
 
-        // When the screen is turned off and turned back on, the SurfaceTexture is already
-        // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
-        // a camera and start preview from here (otherwise, we wait until the surface is ready in
-        // the SurfaceTextureListener).
         if (mTextureView.isAvailable) {
             openCamera(mTextureView.width, mTextureView.height)
         } else {
@@ -398,6 +399,41 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    private val readerListener: ImageReader.OnImageAvailableListener =
+
+        object : ImageReader.OnImageAvailableListener {
+
+            override fun onImageAvailable(reader: ImageReader) {
+                var image: Image? = null
+                try {
+                    image = reader.acquireLatestImage()
+                    val buffer: ByteBuffer = image.planes[0].buffer
+                    val bytes = ByteArray(buffer.capacity())
+                    buffer.get(bytes)
+                    val encodedImage: String =
+                        Base64.getEncoder().encodeToString(bytes)
+                    save(bytes)
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                } finally {
+                    image?.close()
+                }
+            }
+
+            @Throws(IOException::class)
+            private fun save(bytes: ByteArray) {
+                var output: OutputStream? = null
+                try {
+                    output = FileOutputStream(file)
+                    output.write(bytes)
+                } finally {
+                    output?.close()
+                }
+            }
+        }
+
     private fun takePicture() {
 
         val manager =
@@ -409,8 +445,8 @@ class CameraActivity : AppCompatActivity() {
             jpegSizes =
                 characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                     ?.getOutputSizes(ImageFormat.JPEG)
-            var width = 640
-            var height = 480
+            val width = 640
+            val height = 480
 //            if (jpegSizes != null && jpegSizes.isNotEmpty()) {
 //                width = jpegSizes[0].width
 //                height = jpegSizes[0].height
@@ -428,48 +464,13 @@ class CameraActivity : AppCompatActivity() {
             // Orientation
             val rotation = windowManager.defaultDisplay.rotation
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation))
-            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "pic.jpg")
-
-            val readerListener: ImageReader.OnImageAvailableListener =
-
-                object : ImageReader.OnImageAvailableListener {
-
-                    override fun onImageAvailable(reader: ImageReader) {
-                        var image: Image? = null
-                        try {
-                            image = reader.acquireLatestImage()
-                            val buffer: ByteBuffer = image.planes[0].buffer
-                            val bytes = ByteArray(buffer.capacity())
-                            buffer.get(bytes)
-                            val encodedImage: String =
-                                Base64.getEncoder().encodeToString(bytes)
-                            save(bytes)
-                        } catch (e: FileNotFoundException) {
-                            e.printStackTrace()
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        } finally {
-                            image?.close()
-                        }
-                    }
-
-                    @Throws(IOException::class)
-                    private fun save(bytes: ByteArray) {
-                        var output: OutputStream? = null
-                        try {
-                            output = FileOutputStream(file)
-                            output.write(bytes)
-                        } finally {
-                            output?.close()
-                        }
-                    }
-                }
 
             reader.setOnImageAvailableListener(readerListener, mBackgroundHandler)
 
             val captureListener: CaptureCallback = object : CaptureCallback() {
                 override fun onCaptureCompleted(
                     session: CameraCaptureSession,
+
                     request: CaptureRequest,
                     result: TotalCaptureResult
                 ) {

@@ -1,26 +1,24 @@
-package com.scania.vuzixquality.utils
+package com.scania.vuzixquality.controllers
 
 import android.app.Activity
-import android.content.IntentFilter
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.vuzix.sdk.speechrecognitionservice.VuzixSpeechClient
-import java.lang.Exception
 
 
-class VoiceController {
+class VoiceController(activity: AppCompatActivity): BroadcastReceiver() {
 
     // TODO Check is the listener is active
-    // TODO Create a singleton
 
-    lateinit var sc: VuzixSpeechClient
+    private lateinit var sc: VuzixSpeechClient
+    private lateinit var activity: Activity
 
-    lateinit var activity: Activity
-
-    constructor(activity: AppCompatActivity) {
-
+    init {
         try {
             this.activity = activity
             VuzixSpeechClient.EnableRecognizer(this.activity.applicationContext, true)
@@ -29,18 +27,10 @@ class VoiceController {
             Toast.makeText(activity.applicationContext, "VOICE IS ACTIVE", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
             Log.e("VOICE_CONTROLLER_EXCEPTION", "DEVICE ERROR")
-            Log.e("VOICE_CONTROLLER_EXCEPTION", e.message)
+            Log.e("VOICE_CONTROLLER_EXCEPTION", e.message!!)
         }
-
     }
 
-    fun startListening() {
-
-    }
-
-    fun stopListening() {
-
-    }
 
     private fun registerPhrases() {
 
@@ -67,6 +57,19 @@ class VoiceController {
 
         sc.insertKeycodePhrase("error", KeyEvent.KEYCODE_DEL)
 
+    }
+
+    override fun onReceive(context: Context?, intent: Intent?) {
+        TODO("Not yet implemented")
+    }
+
+    fun unregister() {
+        try {
+            this.activity.unregisterReceiver(this)
+            Log.i("VUZIX", "Custom vocab removed")
+        } catch (e: Exception) {
+            Log.e("VUZIX", "Custom vocab died " + e.message)
+        }
     }
 
 

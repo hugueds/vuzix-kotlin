@@ -1,6 +1,11 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+ext {
+    SERVER = 'http://10.33.22.113:8080'
+}// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    ext {
+        SERVER = 'BBBBBBBBBB'
+    }
     ext.kotlin_version = '1.3.71'
     repositories {
         google()

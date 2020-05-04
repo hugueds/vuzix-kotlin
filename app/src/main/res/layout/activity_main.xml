@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".activities.MainActivity">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/black" />
+    <!--    <TextView-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="50dp"-->
+    <!--        android:background="@color/black" />-->
+
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
+        android:text="PRESSIONE O BOTÃO POSTERIOR \nPARA LER CÓDIGO DE BARRAS \n DO VEICULO NO POSTO DE MONTAGEM"
         android:textAlignment="center"
-        android:textSize="33sp"
-        android:text="PRESSIONE O BOTÃO POSTERIOR \nPARA LER CÓDIGO DE BARRAS \n DO VEICULO NO POSTO DE MONTAGEM" />
+        android:textSize="33sp" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:textAlignment="center"
         android:focusable="true"
-        android:focusedByDefault="true"
         android:focusableInTouchMode="true"
-        android:textSize="50sp"
+        android:focusedByDefault="true"
         android:text="ABRIR LEITOR"
-        />
+        android:textAlignment="center"
+        android:textSize="50sp" />
 
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.scania.vuzixquality
+package com.scania.vuzixquality.controllers
 
 import android.app.Activity
 import android.os.CountDownTimer

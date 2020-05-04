@@ -14,8 +14,6 @@ class OperationResult {
     private var dateTime: LocalDateTime? = null
     private var errorPicture: String = ""
 
-    constructor(){}
-
     constructor(result:Int, operationId: Int, chassi: String, errorPicture: String? = null) {
         this.result = result
         this.operationId = operationId
@@ -40,4 +38,4 @@ class OperationResult {
 
 }
 
-data class OperationResultResponse( val error: Boolean,  val message: String )
+

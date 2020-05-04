@@ -5,40 +5,39 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
-import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.scania.vuzixquality.R
 import com.scania.vuzixquality.model.OperationResult
 import com.scania.vuzixquality.utils.OperationLogger
-import com.scania.vuzixquality.utils.VoiceController
+import com.scania.vuzixquality.controllers.VoiceController
 import com.vuzix.sdk.barcode.ScannerIntent
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQUEST_CODE_SCAN = 0
-    lateinit var voiceController: VoiceController
-    private val server = "http://192.168.1.16:5000/"
-    private val DEVICE_TYPE = 2 // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
-
     // TODO Create preferences Class
     // TODO Load preferences
     // TODO Enable buttons or not by preferences
     // TODO Create a preferences menu in Main
+    // TODO Transform Vuzix into Static Class
+    // TODO Regex Chassis Number Validation
 
+    private val REQUEST_CODE_SCAN = 0
+    lateinit var voiceController: VoiceController
+    private val server =  "http://10.33.22.113:8080" //"http://192.168.1.16:5000/"
+    private val DEVICE_TYPE = 0   // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-//        window.setFlags(
-//            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//            WindowManager.LayoutParams.FLAG_FULLSCREEN
-//        )
 
-        voiceController = VoiceController(this)
+
+        voiceController =
+            VoiceController(this)
 
         button.setOnClickListener {
 
@@ -66,10 +65,13 @@ class MainActivity : AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK) {
                     Log.i("SCAN", "SCAN OK")
                     val resultString =
-                        data?.getStringExtra(ScannerIntent.RESULT_EXTRA_BARCODE_TEXT);
-                    // TODO Chassis Number Validation
-                    if (resultString != "" || resultString.length < 7)
+                        data?.getStringExtra(ScannerIntent.RESULT_EXTRA_BARCODE_TEXT)
+                    val test = true;
+                    if (resultString != "" && resultString?.length == 7 || test)
                         navigate(resultString)
+                    else
+                        Toast.makeText(this@MainActivity, "CODIGO DE BARRA INVALIDO",
+                            Toast.LENGTH_LONG).show()
                 }
 
             }
@@ -102,7 +104,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
 
         return super.dispatchKeyEvent(event)
     }
