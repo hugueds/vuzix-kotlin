@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.CameraActivity"
-    android:orientation="horizontal">
+    android:orientation="vertical"
+    tools:context=".activities.CameraActivity">
 
     <TextureView
         android:id="@+id/texture"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"      />
+        android:layout_height="350dp" />
 
     <Button
-        android:id="@+id/button_takePicture"
+        android:id="@+id/btn_takepicture"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TAKE PICTURE"
+        android:layout_height="match_parent"
+        android:text="FOTOGRAFAR"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />

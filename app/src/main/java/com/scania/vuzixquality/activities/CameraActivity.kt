@@ -1,30 +1,33 @@
 package com.scania.vuzixquality.activities
 
-
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.hardware.camera2.*
+import android.hardware.camera2.CameraCaptureSession.CaptureCallback
+import android.media.Image
 import android.media.ImageReader
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.util.Size
+import android.util.SparseIntArray
 import android.view.Surface
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.scania.vuzixquality.R
 import kotlinx.android.synthetic.main.activity_camera.*
+import java.io.*
+import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
-import java.util.jar.Manifest
-import kotlin.Comparator
 import kotlin.collections.ArrayList
 
 
@@ -33,10 +36,11 @@ class CameraActivity : AppCompatActivity() {
     private val MAX_PREVIEW_WIDTH = 1920
     private val MAX_PREVIEW_HEIGHT = 1080
 
-    private var mCameraId: String? = null
+    private var mCameraId: String = ""
     private lateinit var mTextureView: TextureView
     private lateinit var mCaptureSession: CameraCaptureSession
     private lateinit var mCameraDevice: CameraDevice
+    private lateinit var mCamera: Camera
     private var mPreviewSize: Size? = null
     private var mBackgroundThread: HandlerThread? = null
     private var mBackgroundHandler: Handler? = null
@@ -46,10 +50,12 @@ class CameraActivity : AppCompatActivity() {
     private val mCameraOpenCloseLock: Semaphore = Semaphore(1)
     private val REQUEST_CAMERA_PERMISSION = 1
 
+    private val ORIENTATIONS: SparseIntArray = SparseIntArray()
+
 
     private val mStateCallback: CameraDevice.StateCallback = object : CameraDevice.StateCallback() {
+
         override fun onOpened(cameraDevice: CameraDevice) {
-            // This method is called when the camera is opened.  We start camera preview here.
             mCameraOpenCloseLock.release()
             mCameraDevice = cameraDevice
             createCameraPreviewSession()
@@ -95,8 +101,23 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
+        ORIENTATIONS.append(Surface.ROTATION_0, 180)
+        ORIENTATIONS.append(Surface.ROTATION_90, 90)
+        ORIENTATIONS.append(Surface.ROTATION_180, 0)
+        ORIENTATIONS.append(Surface.ROTATION_270, 270)
+
         mTextureView = texture
 
+        btn_takepicture.setOnClickListener() {
+            takePicture()
+        }
+
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.i("CODE", requestCode.toString())
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onResume() {
@@ -143,7 +164,7 @@ class CameraActivity : AppCompatActivity() {
                 // for ActivityCompat#requestPermissions for more details.
                 return
             }
-            manager.openCamera(mCameraId!!, mStateCallback, mBackgroundHandler)
+            manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler)
         } catch (e: CameraAccessException) {
             e.printStackTrace()
         } catch (e: InterruptedException) {
@@ -153,16 +174,12 @@ class CameraActivity : AppCompatActivity() {
 
     private fun closeCamera() {
         try {
+
             mCameraOpenCloseLock.acquire()
-            if (null != mCaptureSession) {
-                mCaptureSession.close()
-            }
-            if (null != mCameraDevice) {
-                mCameraDevice!!.close()
-            }
-            if (null != mImageReader) {
-                mImageReader.close()
-            }
+            mCaptureSession.close()
+            mCameraDevice.close()
+            mImageReader.close()
+
         } catch (e: InterruptedException) {
             throw java.lang.RuntimeException("Interrupted while trying to lock camera closing.", e)
         } finally {
@@ -185,14 +202,8 @@ class CameraActivity : AppCompatActivity() {
                 }
                 val map = characteristics.get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP
-                )
-                    ?: continue
+                ) ?: continue
 
-                // For still image captures, we use the largest available size.
-//                val largest: Size = Collections.max(
-//                    Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-//                    CompareSizesByArea()
-//                )
                 mImageReader = ImageReader.newInstance(
                     1920, 1080,
                     ImageFormat.JPEG,  /*maxImages*/2
@@ -217,7 +228,7 @@ class CameraActivity : AppCompatActivity() {
                 mPreviewSize = chooseOptimalSize(
                     map.getOutputSizes(SurfaceTexture::class.java),
                     width, height, maxPreviewWidth,
-                    maxPreviewHeight, Size(1920,1080)
+                    maxPreviewHeight, Size(1920, 1080)
                 )
                 mCameraId = cameraId
                 return
@@ -248,18 +259,19 @@ class CameraActivity : AppCompatActivity() {
 
             // We set up a CaptureRequest.Builder with the output Surface.
             mPreviewRequestBuilder =
-                mCameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             mPreviewRequestBuilder.addTarget(surface)
 
             // Here, we create a CameraCaptureSession for camera preview.
             mCameraDevice.createCaptureSession(
                 listOf(surface, mImageReader.surface),
                 object : CameraCaptureSession.StateCallback() {
+
                     override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
                         // The camera is already closed
-                        if (null == mCameraDevice) {
-                            return
-                        }
+//                        if (null == mCameraDevice) {
+//                            return
+//                        }
 
                         // When the session is ready, we start displaying the preview.
                         mCaptureSession = cameraCaptureSession
@@ -272,7 +284,7 @@ class CameraActivity : AppCompatActivity() {
 
                             // Finally, we start displaying the camera preview.
                             mPreviewRequest = mPreviewRequestBuilder.build()
-                            mCaptureSession!!.setRepeatingRequest(
+                            mCaptureSession.setRepeatingRequest(
                                 mPreviewRequest!!,
                                 null, mBackgroundHandler
                             )
@@ -297,7 +309,7 @@ class CameraActivity : AppCompatActivity() {
     private fun startBackgroundThread() {
         mBackgroundThread = HandlerThread("CameraBackground")
         mBackgroundThread!!.start()
-        mBackgroundHandler = Handler(mBackgroundThread!!.getLooper())
+        mBackgroundHandler = Handler(mBackgroundThread!!.looper)
     }
 
     private fun stopBackgroundThread() {
@@ -350,15 +362,14 @@ class CameraActivity : AppCompatActivity() {
 
 
     private fun configureTransform(viewWidth: Int, viewHeight: Int) {
-        if (null == mTextureView || null == mPreviewSize) {
-            return
-        }
+
         val rotation = windowManager.defaultDisplay.rotation
         val matrix = Matrix()
-        val left: Float = 0.0f
-        val top: Float = 0.0f
+        val left = 0.0f
+        val top = 0.0f
         val viewRect = RectF(left, top, viewWidth.toFloat(), viewHeight.toFloat())
-        val bufferRect = RectF(left, top,
+        val bufferRect = RectF(
+            left, top,
             mPreviewSize!!.height.toFloat(),
             mPreviewSize!!.width.toFloat()
         )
@@ -387,10 +398,110 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    private fun takePicture() {
 
+        val manager =
+            getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        try {
+            val characteristics =
+                manager.getCameraCharacteristics(mCameraId)
+            var jpegSizes: Array<Size>? = null
+            jpegSizes =
+                characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                    ?.getOutputSizes(ImageFormat.JPEG)
+            var width = 640
+            var height = 480
+//            if (jpegSizes != null && jpegSizes.isNotEmpty()) {
+//                width = jpegSizes[0].width
+//                height = jpegSizes[0].height
+//            }
+            val reader =
+                ImageReader.newInstance(width, height, ImageFormat.JPEG, 1)
+            val outputSurfaces: MutableList<Surface> =
+                ArrayList(2)
+            outputSurfaces.add(reader.surface)
+            outputSurfaces.add(Surface(texture.surfaceTexture))
+            val captureBuilder: CaptureRequest.Builder =
+                mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+            captureBuilder.addTarget(reader.surface)
+            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
+            // Orientation
+            val rotation = windowManager.defaultDisplay.rotation
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation))
+            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "pic.jpg")
 
+            val readerListener: ImageReader.OnImageAvailableListener =
 
+                object : ImageReader.OnImageAvailableListener {
 
+                    override fun onImageAvailable(reader: ImageReader) {
+                        var image: Image? = null
+                        try {
+                            image = reader.acquireLatestImage()
+                            val buffer: ByteBuffer = image.planes[0].buffer
+                            val bytes = ByteArray(buffer.capacity())
+                            buffer.get(bytes)
+                            val encodedImage: String =
+                                Base64.getEncoder().encodeToString(bytes)
+                            save(bytes)
+                        } catch (e: FileNotFoundException) {
+                            e.printStackTrace()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        } finally {
+                            image?.close()
+                        }
+                    }
+
+                    @Throws(IOException::class)
+                    private fun save(bytes: ByteArray) {
+                        var output: OutputStream? = null
+                        try {
+                            output = FileOutputStream(file)
+                            output.write(bytes)
+                        } finally {
+                            output?.close()
+                        }
+                    }
+                }
+
+            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler)
+
+            val captureListener: CaptureCallback = object : CaptureCallback() {
+                override fun onCaptureCompleted(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    result: TotalCaptureResult
+                ) {
+                    super.onCaptureCompleted(session, request, result)
+                    Toast.makeText(this@CameraActivity, "Saved:$file", Toast.LENGTH_SHORT).show()
+                    createCameraPreviewSession()
+                }
+            }
+
+            mCameraDevice.createCaptureSession(
+                outputSurfaces,
+                object : CameraCaptureSession.StateCallback() {
+                    override fun onConfigured(session: CameraCaptureSession) {
+                        try {
+                            session.capture(
+                                captureBuilder.build(),
+                                captureListener,
+                                mBackgroundHandler
+                            )
+                        } catch (e: CameraAccessException) {
+                            e.printStackTrace()
+                        }
+                    }
+
+                    override fun onConfigureFailed(session: CameraCaptureSession) {}
+                },
+                mBackgroundHandler
+            )
+        } catch (e: CameraAccessException) {
+            e.printStackTrace()
+        }
+    }
 
 
 }
