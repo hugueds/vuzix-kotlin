@@ -51,7 +51,7 @@ class OperationController {
         this.locked = true
 
         operationResults.add(OperationResult(
-            status,currentOperationTask.id, chassi!!, null)
+            status,currentOperationTask.id, chassi!!, errorPicture)
         )
 
         if (this.indexOperation < totalOperations - 1) {

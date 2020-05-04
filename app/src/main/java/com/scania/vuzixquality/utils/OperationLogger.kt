@@ -17,7 +17,7 @@ import retrofit2.http.POST
 
 interface Endpoint {
     @POST("vuzix")
-    fun createOperationResult(@Body body: List<OperationResult>): retrofit2.Call<OperationResultResponse>
+    fun create(@Body body: List<OperationResult>): retrofit2.Call<OperationResultResponse>
 }
 
 class OperationLogger() {
@@ -30,34 +30,42 @@ class OperationLogger() {
 
             // TODO Store data in SQLite DB
             Toast.makeText(context, "RESULTADOS SALVOS COM SUCESSO", Toast.LENGTH_LONG).show()
+
+            val displayLogs = false
             for (r in results) {
-                Log.i("RESULT", r.toString())
+                if (displayLogs)
+                    Log.i("RESULT", r.toString())
             }
 
-            this.submit(context, "http://10.33.22.113:8080", results)
+            this.submit(context, results, "http://10.33.22.113:8080")
 
         }
 
-        fun submit(context: Context, server: String = "http://10.33.22.113:8080", results: List<OperationResult>) {
+        fun submit(
+            context: Context,
+            results: List<OperationResult>,
+            server: String = "http://10.33.22.113:8080"
+        ) {
 
             val client = NetworkUtils.getRetrofitInstance(server)
             val endpoint = client.create(Endpoint::class.java)
 
-            endpoint.createOperationResult(results).enqueue(object : Callback<OperationResultResponse> {
+            endpoint.create(results)
+                .enqueue(object : Callback<OperationResultResponse> {
 
-                override fun onFailure(call: Call<OperationResultResponse>, t: Throwable) {
-                    Log.e("SUBMIT", t.toString())
-                    Toast.makeText(context, t.message, Toast.LENGTH_LONG).show()
-                }
+                    override fun onFailure(call: Call<OperationResultResponse>, t: Throwable) {
+                        Log.e("SUBMIT", t.toString())
+                        Toast.makeText(context, t.message, Toast.LENGTH_LONG).show()
+                    }
 
-                override fun onResponse(
-                    call: Call<OperationResultResponse>,
-                    response: Response<OperationResultResponse>
-                ) {
-                    Toast.makeText(context, response.body()?.message, Toast.LENGTH_LONG).show()
-                }
+                    override fun onResponse(
+                        call: Call<OperationResultResponse>,
+                        response: Response<OperationResultResponse>
+                    ) {
+                        Toast.makeText(context, response.body()?.message, Toast.LENGTH_LONG).show()
+                    }
 
-            })
+                })
 
         }
 

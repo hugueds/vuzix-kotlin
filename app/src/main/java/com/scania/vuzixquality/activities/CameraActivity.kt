@@ -1,5 +1,6 @@
 package com.scania.vuzixquality.activities
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,6 +26,7 @@ import com.scania.vuzixquality.R
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.*
 import java.nio.ByteBuffer
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
@@ -33,25 +35,52 @@ import kotlin.collections.ArrayList
 
 class CameraActivity : AppCompatActivity() {
 
-    private val MAX_PREVIEW_WIDTH = 1920
-    private val MAX_PREVIEW_HEIGHT = 1080
+    private val MAX_PREVIEW_WIDTH = 640
+    private val MAX_PREVIEW_HEIGHT = 480
+
+    private val RESULT_STRING_BASE64 = "RESULT_STRING_BASE64"
+
 
     private var mCameraId: String = ""
     private lateinit var mTextureView: TextureView
-    private lateinit var mCaptureSession: CameraCaptureSession
-    private lateinit var mCameraDevice: CameraDevice
-    private lateinit var mCamera: Camera
+    private var mCaptureSession: CameraCaptureSession? = null
+    private var mCameraDevice: CameraDevice? = null
+    private var mCamera: Camera? = null
     private var mPreviewSize: Size? = null
     private var mBackgroundThread: HandlerThread? = null
     private var mBackgroundHandler: Handler? = null
-    private lateinit var mImageReader: ImageReader
+    private var mImageReader: ImageReader? = null
     private lateinit var mPreviewRequestBuilder: CaptureRequest.Builder
     private var mPreviewRequest: CaptureRequest? = null
     private val mCameraOpenCloseLock: Semaphore = Semaphore(1)
     private lateinit var file: File
     private val REQUEST_CAMERA_PERMISSION = 1
 
-    private val ORIENTATIONS: SparseIntArray = SparseIntArray()
+    private val ORIENTATIONS = SparseIntArray(4)
+
+    init {
+        ORIENTATIONS.append(Surface.ROTATION_0, 0)
+        ORIENTATIONS.append(Surface.ROTATION_0, 90)
+        ORIENTATIONS.append(Surface.ROTATION_0, 180)
+        ORIENTATIONS.append(Surface.ROTATION_0, 270)
+        file = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+            "Camera/default.jpg"
+        )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_camera)
+
+        mTextureView = texture
+
+        btn_takepicture.setOnClickListener() {
+            takePicture()
+        }
+
+    }
 
 
     private val mStateCallback: CameraDevice.StateCallback = object : CameraDevice.StateCallback() {
@@ -98,32 +127,12 @@ class CameraActivity : AppCompatActivity() {
         override fun onSurfaceTextureUpdated(texture: SurfaceTexture) {}
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera)
-
-        ORIENTATIONS.append(Surface.ROTATION_0, 180)
-        ORIENTATIONS.append(Surface.ROTATION_90, 90)
-        ORIENTATIONS.append(Surface.ROTATION_180, 0)
-        ORIENTATIONS.append(Surface.ROTATION_270, 270)
-
-        mTextureView = texture
-
-        file = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-            "pic.jpg"
-        )
-
-        btn_takepicture.setOnClickListener() {
-            takePicture()
-        }
-
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.i("CODE", requestCode.toString())
         super.onActivityResult(requestCode, resultCode, data)
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -174,13 +183,15 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun closeCamera() {
+
         try {
 
             mCameraOpenCloseLock.acquire()
-            mCaptureSession.close()
-            mCameraDevice.close()
-            mImageReader.close()
-
+            mCaptureSession?.close()
+            mCaptureSession = null
+            mCameraDevice?.close()
+            mImageReader?.close()
+            mImageReader = null
         } catch (e: InterruptedException) {
             throw java.lang.RuntimeException("Interrupted while trying to lock camera closing.", e)
         } finally {
@@ -207,9 +218,10 @@ class CameraActivity : AppCompatActivity() {
 
                 mImageReader = ImageReader.newInstance(
                     1920, 1080,
-                    ImageFormat.JPEG,  /*maxImages*/2
+                    ImageFormat.JPEG,
+                    1
                 )
-                mImageReader.setOnImageAvailableListener(
+                mImageReader?.setOnImageAvailableListener(
                     null, mBackgroundHandler
                 )
                 val displaySize = Point()
@@ -249,9 +261,10 @@ class CameraActivity : AppCompatActivity() {
 
 
     private fun createCameraPreviewSession() {
-        try {
-            val texture = mTextureView.surfaceTexture!!
 
+        try {
+
+            val texture = mTextureView.surfaceTexture!!
             // We configure the size of default buffer to be the size of camera preview we want.
             texture.setDefaultBufferSize(mPreviewSize!!.width, mPreviewSize!!.height)
 
@@ -260,19 +273,19 @@ class CameraActivity : AppCompatActivity() {
 
             // We set up a CaptureRequest.Builder with the output Surface.
             mPreviewRequestBuilder =
-                mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+                mCameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             mPreviewRequestBuilder.addTarget(surface)
 
             // Here, we create a CameraCaptureSession for camera preview.
-            mCameraDevice.createCaptureSession(
-                listOf(surface, mImageReader.surface),
+            mCameraDevice?.createCaptureSession(
+                listOf(surface, mImageReader?.surface),
                 object : CameraCaptureSession.StateCallback() {
 
                     override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
                         // The camera is already closed
-//                        if (null == mCameraDevice) {
-//                            return
-//                        }
+                        if (mCameraDevice == null) {
+                            return
+                        }
 
                         // When the session is ready, we start displaying the preview.
                         mCaptureSession = cameraCaptureSession
@@ -285,7 +298,7 @@ class CameraActivity : AppCompatActivity() {
 
                             // Finally, we start displaying the camera preview.
                             mPreviewRequest = mPreviewRequestBuilder.build()
-                            mCaptureSession.setRepeatingRequest(
+                            mCaptureSession?.setRepeatingRequest(
                                 mPreviewRequest!!,
                                 null, mBackgroundHandler
                             )
@@ -336,6 +349,7 @@ class CameraActivity : AppCompatActivity() {
         val notBigEnough: MutableList<Size> = ArrayList()
         val w = aspectRatio.width
         val h = aspectRatio.height
+
         for (option in choices) {
             if (option.width <= maxWidth && option.height <= maxHeight && option.height == option.width * h / w
             ) {
@@ -390,51 +404,8 @@ class CameraActivity : AppCompatActivity() {
     }
 
 
-    class CompareSizesByArea : Comparator<Size?> {
-
-        override fun compare(lhs: Size?, rhs: Size?): Int {
-            return java.lang.Long.signum(
-                lhs?.width?.toLong()!! * lhs.height - rhs?.width?.toLong()!! * rhs.height
-            )
-        }
-    }
-
-    private val readerListener: ImageReader.OnImageAvailableListener =
-
-        object : ImageReader.OnImageAvailableListener {
-
-            override fun onImageAvailable(reader: ImageReader) {
-                var image: Image? = null
-                try {
-                    image = reader.acquireLatestImage()
-                    val buffer: ByteBuffer = image.planes[0].buffer
-                    val bytes = ByteArray(buffer.capacity())
-                    buffer.get(bytes)
-                    val encodedImage: String =
-                        Base64.getEncoder().encodeToString(bytes)
-                    save(bytes)
-                } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                } finally {
-                    image?.close()
-                }
-            }
-
-            @Throws(IOException::class)
-            private fun save(bytes: ByteArray) {
-                var output: OutputStream? = null
-                try {
-                    output = FileOutputStream(file)
-                    output.write(bytes)
-                } finally {
-                    output?.close()
-                }
-            }
-        }
-
     private fun takePicture() {
+
 
         val manager =
             getSystemService(Context.CAMERA_SERVICE) as CameraManager
@@ -445,42 +416,89 @@ class CameraActivity : AppCompatActivity() {
             jpegSizes =
                 characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                     ?.getOutputSizes(ImageFormat.JPEG)
-            val width = 640
-            val height = 480
+            val width = MAX_PREVIEW_WIDTH
+            val height = MAX_PREVIEW_HEIGHT
 //            if (jpegSizes != null && jpegSizes.isNotEmpty()) {
 //                width = jpegSizes[0].width
 //                height = jpegSizes[0].height
 //            }
             val reader =
                 ImageReader.newInstance(width, height, ImageFormat.JPEG, 1)
-            val outputSurfaces: MutableList<Surface> =
-                ArrayList(2)
+            val outputSurfaces: MutableList<Surface> = ArrayList(2)
             outputSurfaces.add(reader.surface)
             outputSurfaces.add(Surface(texture.surfaceTexture))
             val captureBuilder: CaptureRequest.Builder =
-                mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+                mCameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
             captureBuilder.addTarget(reader.surface)
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
             // Orientation
-            val rotation = windowManager.defaultDisplay.rotation
+            val rotation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation))
 
-            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler)
+            val readerListener: ImageReader.OnImageAvailableListener =
+
+                object : ImageReader.OnImageAvailableListener {
+
+                    override fun onImageAvailable(reader: ImageReader) {
+                        var image: Image? = null
+                        var encodedImage = ""
+                        try {
+                            image = reader.acquireLatestImage()
+                            val buffer: ByteBuffer = image.planes[0].buffer
+                            val bytes = ByteArray(buffer.capacity())
+                            buffer.get(bytes)
+                            encodedImage = Base64.getEncoder().encodeToString(bytes)
+                            save(bytes)
+                        } catch (e: FileNotFoundException) {
+                            e.printStackTrace()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        } finally {
+                            image?.close()
+                            val resultIntent = Intent()
+                            resultIntent.putExtra(RESULT_STRING_BASE64, encodedImage)
+                            setResult(Activity.RESULT_OK, resultIntent)
+                            this@CameraActivity.finish()
+                        }
+                    }
+
+                    @Throws(IOException::class)
+                    private fun save(bytes: ByteArray) {
+                        var output: OutputStream? = null
+                        try {
+                            val formatter = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US)
+                            val now = Date()
+                            val fileName: String = formatter.format(now).toString() + ".jpg"
+                            file = File(
+                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                                "VuzixQuality/$fileName"
+                            )
+                            output = FileOutputStream(file)
+                            output.write(bytes)
+                        } finally {
+                            output?.close()
+                        }
+                    }
+
+                }
+
 
             val captureListener: CaptureCallback = object : CaptureCallback() {
+
                 override fun onCaptureCompleted(
                     session: CameraCaptureSession,
-
                     request: CaptureRequest,
                     result: TotalCaptureResult
                 ) {
                     super.onCaptureCompleted(session, request, result)
-                    Toast.makeText(this@CameraActivity, "Saved:$file", Toast.LENGTH_SHORT).show()
-                    createCameraPreviewSession()
+//                    Toast.makeText(this@CameraActivity, "Saved", Toast.LENGTH_SHORT).show()
+//                    createCameraPreviewSession()
                 }
             }
 
-            mCameraDevice.createCaptureSession(
+            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler)
+
+            mCameraDevice!!.createCaptureSession(
                 outputSurfaces,
                 object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(session: CameraCaptureSession) {
@@ -501,6 +519,15 @@ class CameraActivity : AppCompatActivity() {
             )
         } catch (e: CameraAccessException) {
             e.printStackTrace()
+        }
+    }
+
+    class CompareSizesByArea : Comparator<Size?> {
+
+        override fun compare(lhs: Size?, rhs: Size?): Int {
+            return java.lang.Long.signum(
+                lhs?.width?.toLong()!! * lhs.height - rhs?.width?.toLong()!! * rhs.height
+            )
         }
     }
 

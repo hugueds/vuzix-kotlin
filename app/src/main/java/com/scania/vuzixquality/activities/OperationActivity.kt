@@ -3,6 +3,8 @@ package com.scania.vuzixquality.activities
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
@@ -101,13 +103,14 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             button_notok.id -> {
                 Log.i("BUTTON", "BUTTON NOT OK PRESSED")
                 color = Color.RED
-                // Abrir um Alert perguntando se gostaria de tirar uma foto
 
+                // Abrir um Alert perguntando se gostaria de tirar uma foto
                 val builder = AlertDialog.Builder(this)
                 builder.setTitle("MENSAGEM")
                 builder.setMessage("Gostaria de Fotografar o Desvio?")
-
+//                builder.show()
                 operationController.updateOperation(updateTasks, 2)
+
             }
 
         }
@@ -137,12 +140,20 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
                 Log.i("KEY", "CENTER")
             }
             KeyEvent.KEYCODE_DEL -> {
-                this.animateBackground(Color.RED)
-                operationController.updateOperation(updateTasks, 2)
+                if (event.action == KeyEvent.ACTION_UP) {
+                    this.animateBackground(Color.RED)
+                    // Abrir a activity da foto
+                    val intent = Intent(this, CameraActivity::class.java)
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+                    // Receber a foto como string
+//                    operationController.updateOperation(updateTasks, 2)
+                }
             }
             KeyEvent.KEYCODE_FORWARD_DEL -> {
-                this.animateBackground(Color.GREEN)
-                operationController.updateOperation(updateTasks, 1)
+                if (event.action == KeyEvent.ACTION_UP) {
+                    this.animateBackground(Color.GREEN)
+                    operationController.updateOperation(updateTasks, 1)
+                }
             }
             KeyEvent.KEYCODE_MENU -> {
                 Log.i("KEY", "MENU")
@@ -158,6 +169,20 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            REQUEST_IMAGE_CAPTURE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val errorPicture = data?.getStringExtra("RESULT_STRING_BASE64")
+                    operationController.updateOperation(updateTasks, 2, errorPicture)
+                }
+            }
+        }
+
+    }
+
     private fun loadImage(imgString: String): Bitmap {
         val splitImgString = imgString.split(",")[1]
         val img = Base64.decode(splitImgString, Base64.DEFAULT)
@@ -170,6 +195,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             layout_operation, "backgroundColor", ArgbEvaluator(),
             Color.BLACK, color
         ).setDuration(animationTime).start()
+
     }
 
 

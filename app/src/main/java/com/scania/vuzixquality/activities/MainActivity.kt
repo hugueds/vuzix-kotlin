@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private val REQUEST_CODE_SCAN = 0
     lateinit var voiceController: VoiceController
-    private val server =  "http://10.33.22.113:8080" //"http://192.168.1.16:5000/"
+    private val server = "http://10.33.22.113:8080" //"http://192.168.1.16:5000/"
     private val DEVICE_TYPE = 0   // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
 
 
@@ -70,8 +70,10 @@ class MainActivity : AppCompatActivity() {
                     if (resultString != "" && resultString?.length == 7 || test)
                         navigate(resultString)
                     else
-                        Toast.makeText(this@MainActivity, "CODIGO DE BARRA INVALIDO",
-                            Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@MainActivity, "CODIGO DE BARRA INVALIDO",
+                            Toast.LENGTH_LONG
+                        ).show()
                 }
 
             }
@@ -94,7 +96,8 @@ class MainActivity : AppCompatActivity() {
                 val results = listOf(
                     OperationResult(1, 2, "CHASSIS", "BASE64")
                 )
-                OperationLogger.submit(this, server, results)
+                if (event.action == KeyEvent.ACTION_UP)
+                    OperationLogger.submit(this, results, server)
             }
 
             KeyEvent.KEYCODE_2 -> {
