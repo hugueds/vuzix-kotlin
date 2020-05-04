@@ -25,18 +25,48 @@ import com.scania.vuzixquality.R
 import kotlinx.android.synthetic.main.activity_operation.*
 
 import com.scania.vuzixquality.repository.OperationLoader
+import com.scania.vuzixquality.utils.VoiceController
 
 class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
-    // TODO Enable buttons or not via config
-
-    private val animationTime: Long = 750 // CONFIG FILE
+    private var locked = false
+    private val animationTime: Long = 750
     private lateinit var operationController: OperationController
+    private val mView = this
     private val REQUEST_IMAGE_CAPTURE = 1
 
+    lateinit var voiceController: VoiceController
 
 
+    // TODO Implement Voice Controller
+    // TODO Enable buttons or not via config
     //    val cameraStateCallbacks =  Camera
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        supportActionBar?.hide()
+//        window.setFlags(
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//            WindowManager.LayoutParams.FLAG_FULLSCREEN
+//        )
+
+        setContentView(R.layout.activity_operation)
+
+        voiceController = VoiceController(this)
+
+        val operations = OperationLoader.json(this.applicationContext)
+
+        operationController =
+            OperationController(this, operations)
+        operationController.updateOperation(0, updateTasks)
+
+        text_chassi.text = operationController.chassi
+
+        registerListeners()
+
+    }
 
     // On Click, On Voice or On Key, add 1 to index and load the next picture
     @SuppressLint("SetTextI18n")
@@ -51,50 +81,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
         text_operation_name.text = operationTask
 
         layout_operation.setBackgroundColor(Color.BLACK)
-
         image_view_operation.setImageBitmap(loadImage(stringPicture))
-    }
-
-    private fun dispatchTakePictureIntent() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(packageManager)?.also {
-                startActivityForResult(takePictureIntent, 1888)
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        Log.i("RESULT", "HAS HAPPENED")
-
-        if (resultCode == Activity.RESULT_OK) {
-            Log.i("OK", data.toString())
-        }
-
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-
-        super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        supportActionBar?.hide()
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
-
-        setContentView(R.layout.activity_operation)
-
-        val operations = OperationLoader.json(this.applicationContext)
-
-        operationController = OperationController(this, operations)
-        operationController.updateOperation(0, updateTasks)
-
-        text_chassi.text = operationController.chassi
-        registerListeners()
-
     }
 
     fun update() {
@@ -155,7 +142,6 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             }
             KeyEvent.KEYCODE_DEL -> {
                 this.animateBackground(Color.RED)
-                dispatchTakePictureIntent()
                 operationController.updateOperation(updateTasks, 2)
             }
             KeyEvent.KEYCODE_FORWARD_DEL -> {
@@ -169,7 +155,6 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
                 Log.i("KEY", "NUMBER 1")
                 operationController.reset(updateTasks)
             }
-
 
         }
 
