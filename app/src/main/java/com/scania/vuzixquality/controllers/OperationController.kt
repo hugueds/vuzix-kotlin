@@ -88,7 +88,7 @@ class OperationController {
     }
 
     private fun finish() {
-        // Ask the user if he wants to finish and store the results
+
         val timer = object : CountDownTimer(OPERATION_TIME, OPERATION_TIME) {
 
             override fun onFinish() {
@@ -107,9 +107,6 @@ class OperationController {
         callback()
     }
 
-    fun setListener(function: () -> Unit) {
-        function()
-    }
 
 
 }

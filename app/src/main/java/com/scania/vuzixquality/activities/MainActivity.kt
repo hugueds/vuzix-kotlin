@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     // TODO Regex Chassis Number Validation
 
     private val REQUEST_CODE_SCAN = 0
-    lateinit var voiceController: VoiceController
+    private lateinit var voiceController: VoiceController
     private val server = "http://10.33.22.113:8080" //"http://192.168.1.16:5000/"
     private val DEVICE_TYPE = 0   // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
 
@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-
 
         voiceController =
             VoiceController(this)
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                     Log.i("SCAN", "SCAN OK")
                     val resultString =
                         data?.getStringExtra(ScannerIntent.RESULT_EXTRA_BARCODE_TEXT)
-                    val test = true;
+                    val test = true
                     if (resultString != "" && resultString?.length == 7 || test)
                         navigate(resultString)
                     else
@@ -106,6 +105,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
             }
+
         }
 
         return super.dispatchKeyEvent(event)

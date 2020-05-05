@@ -44,19 +44,19 @@ class VoiceController(activity: AppCompatActivity): BroadcastReceiver() {
         sc.insertKeycodePhrase("okay", KeyEvent.KEYCODE_FORWARD_DEL)
         sc.insertKeycodePhrase("praaxymoo", KeyEvent.KEYCODE_FORWARD_DEL)
         sc.insertKeycodePhrase("praaxymow", KeyEvent.KEYCODE_FORWARD_DEL)
+        sc.insertKeycodePhrase("pro cmoe", KeyEvent.KEYCODE_FORWARD_DEL)
         sc.insertKeycodePhrase("saertow", KeyEvent.KEYCODE_FORWARD_DEL)
         sc.insertKeycodePhrase("saertoo", KeyEvent.KEYCODE_FORWARD_DEL)
 
 
 //        sc.insertKeycodePhrase("not okay", KeyEvent.KEYCODE_DEL)
         sc.insertKeycodePhrase("thees view", KeyEvent.KEYCODE_DEL)
+        sc.insertKeycodePhrase("thees_view", KeyEvent.KEYCODE_DEL)
         sc.insertKeycodePhrase("theesview", KeyEvent.KEYCODE_DEL)
         sc.insertKeycodePhrase("this viel", KeyEvent.KEYCODE_DEL)
         sc.insertKeycodePhrase("thisviel", KeyEvent.KEYCODE_DEL)
 
-
         sc.insertKeycodePhrase("error", KeyEvent.KEYCODE_DEL)
-
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {

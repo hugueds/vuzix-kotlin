@@ -6,4 +6,6 @@
     <color name="black">#000</color>
     <color name="yellow">#fad900</color>
     <color name="white">#fff</color>
+    <color name="lime">#bfff00</color>
+    <color name="navy">#2222AA</color>
 </resources>

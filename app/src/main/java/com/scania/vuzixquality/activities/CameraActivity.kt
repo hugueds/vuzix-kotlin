@@ -53,16 +53,16 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var mPreviewRequestBuilder: CaptureRequest.Builder
     private var mPreviewRequest: CaptureRequest? = null
     private val mCameraOpenCloseLock: Semaphore = Semaphore(1)
-    private lateinit var file: File
+    private var file: File
     private val REQUEST_CAMERA_PERMISSION = 1
 
     private val ORIENTATIONS = SparseIntArray(4)
 
     init {
         ORIENTATIONS.append(Surface.ROTATION_0, 0)
-        ORIENTATIONS.append(Surface.ROTATION_0, 90)
-        ORIENTATIONS.append(Surface.ROTATION_0, 180)
-        ORIENTATIONS.append(Surface.ROTATION_0, 270)
+        ORIENTATIONS.append(Surface.ROTATION_90, 90)
+        ORIENTATIONS.append(Surface.ROTATION_180, 180)
+        ORIENTATIONS.append(Surface.ROTATION_270, 270)
         file = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
             "Camera/default.jpg"
@@ -104,6 +104,7 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private val mSurfaceTextureListener: SurfaceTextureListener = object : SurfaceTextureListener {
+
         override fun onSurfaceTextureAvailable(
             texture: SurfaceTexture,
             width: Int,
@@ -219,8 +220,9 @@ class CameraActivity : AppCompatActivity() {
                 mImageReader = ImageReader.newInstance(
                     1920, 1080,
                     ImageFormat.JPEG,
-                    1
+                    2
                 )
+
                 mImageReader?.setOnImageAvailableListener(
                     null, mBackgroundHandler
                 )
@@ -302,6 +304,7 @@ class CameraActivity : AppCompatActivity() {
                                 mPreviewRequest!!,
                                 null, mBackgroundHandler
                             )
+
                         } catch (e: CameraAccessException) {
                             e.printStackTrace()
                         }
@@ -378,6 +381,10 @@ class CameraActivity : AppCompatActivity() {
 
     private fun configureTransform(viewWidth: Int, viewHeight: Int) {
 
+        if (null == mTextureView || null == mPreviewSize) {
+            return
+        }
+
         val rotation = windowManager.defaultDisplay.rotation
         val matrix = Matrix()
         val left = 0.0f
@@ -390,15 +397,19 @@ class CameraActivity : AppCompatActivity() {
         )
         val centerX = viewRect.centerX()
         val centerY = viewRect.centerY()
+
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
-            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
-            val scale =
-                (viewHeight.toFloat() / mPreviewSize!!.height).coerceAtLeast(viewWidth.toFloat() / mPreviewSize!!.width)
-            matrix.postScale(scale, scale, centerX, centerY)
-            matrix.postRotate(90 * (rotation.toFloat() - 2), centerX, centerY)
+            val scale = Math.max(
+                viewHeight.toFloat() / mPreviewSize!!.height,
+                viewWidth.toFloat() / mPreviewSize!!.width)
+            with(matrix) {
+                setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
+                postScale(scale, scale, centerX, centerY)
+                postRotate((90 * (rotation - 2)).toFloat(), centerX, centerY)
+            }
         } else if (Surface.ROTATION_180 == rotation) {
-            matrix.postRotate(180.toFloat(), centerX, centerY)
+            matrix.postRotate(180f, centerX, centerY)
         }
         mTextureView.setTransform(matrix)
     }
@@ -412,8 +423,7 @@ class CameraActivity : AppCompatActivity() {
         try {
             val characteristics =
                 manager.getCameraCharacteristics(mCameraId)
-            var jpegSizes: Array<Size>? = null
-            jpegSizes =
+            var jpegSizes: Array<Size>? =
                 characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                     ?.getOutputSizes(ImageFormat.JPEG)
             val width = MAX_PREVIEW_WIDTH
@@ -433,7 +443,8 @@ class CameraActivity : AppCompatActivity() {
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
             // Orientation
             val rotation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation))
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(90))
+
 
             val readerListener: ImageReader.OnImageAvailableListener =
 
@@ -530,6 +541,8 @@ class CameraActivity : AppCompatActivity() {
             )
         }
     }
+
+
 
 
 }

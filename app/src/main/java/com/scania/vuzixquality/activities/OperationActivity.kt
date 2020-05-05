@@ -5,12 +5,14 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Base64
 
 import android.util.Log
@@ -24,6 +26,7 @@ import kotlinx.android.synthetic.main.activity_operation.*
 
 import com.scania.vuzixquality.repository.OperationLoader
 import com.scania.vuzixquality.controllers.VoiceController
+import com.scania.vuzixquality.utils.OperationLogger
 
 class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -32,37 +35,53 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var operationController: OperationController
     private val mView = this
     private val REQUEST_IMAGE_CAPTURE = 1
-
     lateinit var voiceController: VoiceController
 
+    private var totalTime = 300.0
+    var timeBar = totalTime
+
+    init {
+
+    }
 
     // TODO Implement Voice Controller
     // TODO Enable buttons or not via config
-    // val cameraStateCallbacks =  Camera
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         supportActionBar?.hide()
-
         setContentView(R.layout.activity_operation)
+        this.registerListeners()
 
-        voiceController =
-            VoiceController(this)
+        voiceController = VoiceController(this)
 
         val operations = OperationLoader.json(this.applicationContext)
+        operationController = OperationController(this, operations)
 
-        operationController =
-            OperationController(
-                this,
-                operations
-            )
         operationController.updateOperation(0, updateTasks)
-
+1
         text_chassi.text = operationController.chassi
 
-        registerListeners()
+        val timer = object : CountDownTimer((totalTime * 1000).toLong() , 1000) {
+
+            override fun onFinish() {
+
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                timeBar -= 10
+                if (timeBar > 0)
+                    progressBar.progress = ( (timeBar / totalTime) * 100).toInt()
+                else
+                    progressBar.progress = 0
+                if (timeBar <= 30)
+                    progressBar.progressTintList = ColorStateList.valueOf(Color.RED)
+            }
+        }
+        timer.start()
+
 
     }
 
@@ -82,16 +101,9 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
         image_view_operation.setImageBitmap(loadImage(stringPicture))
     }
 
-    fun update() {
-
-    }
-
-
     override fun onClick(v: View?) {
 
-        val context = this
         var color: Int = Color.WHITE
-
         when (v?.id) {
 
             button_ok.id -> {
@@ -105,12 +117,11 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
                 color = Color.RED
 
                 // Abrir um Alert perguntando se gostaria de tirar uma foto
-                val builder = AlertDialog.Builder(this)
-                builder.setTitle("MENSAGEM")
-                builder.setMessage("Gostaria de Fotografar o Desvio?")
+//                val builder = AlertDialog.Builder(this)
+//                builder.setTitle("MENSAGEM")
+//                builder.setMessage("Gostaria de Fotografar o Desvio?")
 //                builder.show()
                 operationController.updateOperation(updateTasks, 2)
-
             }
 
         }
@@ -200,9 +211,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
 
 
     private fun registerListeners() {
-        button_notok.requestFocusFromTouch()
         button_notok.setOnClickListener(this)
-        button_ok.requestFocusFromTouch()
         button_ok.setOnClickListener(this)
     }
 
