@@ -40,7 +40,6 @@ class CameraActivity : AppCompatActivity() {
 
     private val RESULT_STRING_BASE64 = "RESULT_STRING_BASE64"
 
-
     private var mCameraId: String = ""
     private lateinit var mTextureView: TextureView
     private var mCaptureSession: CameraCaptureSession? = null
@@ -400,9 +399,8 @@ class CameraActivity : AppCompatActivity() {
 
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
-            val scale = Math.max(
-                viewHeight.toFloat() / mPreviewSize!!.height,
-                viewWidth.toFloat() / mPreviewSize!!.width)
+            val scale =
+                (viewHeight.toFloat() / mPreviewSize!!.height).coerceAtLeast(viewWidth.toFloat() / mPreviewSize!!.width)
             with(matrix) {
                 setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
                 postScale(scale, scale, centerX, centerY)
@@ -433,18 +431,19 @@ class CameraActivity : AppCompatActivity() {
 //                height = jpegSizes[0].height
 //            }
             val reader =
-                ImageReader.newInstance(width, height, ImageFormat.JPEG, 1)
+                ImageReader.newInstance(width, height, ImageFormat.JPEG, 2)
             val outputSurfaces: MutableList<Surface> = ArrayList(2)
             outputSurfaces.add(reader.surface)
-            outputSurfaces.add(Surface(texture.surfaceTexture))
+            outputSurfaces.add(Surface(mTextureView.surfaceTexture))
             val captureBuilder: CaptureRequest.Builder =
                 mCameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
             captureBuilder.addTarget(reader.surface)
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
             // Orientation
             val rotation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(90))
-
+            val sensorOrientation = ORIENTATIONS.get(rotation)
+            val jpegOrientation = (rotation + sensorOrientation) % 360
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, jpegOrientation)
 
             val readerListener: ImageReader.OnImageAvailableListener =
 
@@ -541,8 +540,6 @@ class CameraActivity : AppCompatActivity() {
             )
         }
     }
-
-
 
 
 }
