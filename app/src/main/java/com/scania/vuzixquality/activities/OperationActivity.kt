@@ -37,12 +37,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
     private val REQUEST_IMAGE_CAPTURE = 1
     lateinit var voiceController: VoiceController
 
-    private var totalTime = 300.0
-    var timeBar = totalTime
-
-    init {
-
-    }
+    private var timeBar = 0
 
     // TODO Implement Voice Controller
     // TODO Enable buttons or not via config
@@ -61,22 +56,25 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
         operationController = OperationController(this, operations)
 
         operationController.updateOperation(0, updateTasks)
-        1
+
         text_chassi.text = operationController.chassi
 
-        val timer = object : CountDownTimer((totalTime * 1000).toLong(), 1000) {
+        timeBar = operationController.totalTime.toInt()
+        Log.i("TOTAL TIME", timeBar.toString())
+
+        val timer = object : CountDownTimer((operationController.totalTime * 1000).toLong(), 1000) {
 
             override fun onFinish() {
-
+                Log.i("TIME", "ACTIVITY TIME HAS FINISHED")
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                timeBar -= 10
+                timeBar -= 1
                 if (timeBar > 0)
-                    progressBar.progress = ((timeBar / totalTime) * 100).toInt()
+                    progressBar.progress = ((timeBar / operationController.totalTime) * 100).toInt()
                 else
                     progressBar.progress = 0
-                if (timeBar <= 30)
+                if (timeBar <= (0.3 * timeBar))
                     progressBar.progressTintList = ColorStateList.valueOf(Color.RED)
             }
         }

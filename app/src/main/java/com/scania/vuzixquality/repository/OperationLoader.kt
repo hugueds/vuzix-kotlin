@@ -17,27 +17,34 @@ class OperationLoader {
                     1,
                     "OP1",
                     "OPER 1",
-                    "R.drawable._01"
+                    "R.drawable._01",
+                    30,
+                    ""
+
                 ),
                 OperationTask(
                     2,
                     "OP2",
                     "OPER 2",
-                    "R.drawable._02"
+                    "R.drawable._02",
+                    30,
+                    ""
                 ),
                 OperationTask(
                     3,
                     "OP3",
                     "OPER 3",
-                    "R.drawable._03"
+                    "R.drawable._03",
+                    30, ""
                 )
             )
         }
 
+
         fun json(context: Context): List<OperationTask> {
             val jsonString: String? = getJsonDataFromAsset(context, "single_chassi.json")
-            val type = object : TypeToken<OperationList>(){}.type
-            val gson : Gson = Gson()
+            val type = object : TypeToken<OperationList>() {}.type
+            val gson: Gson = Gson()
             val op: OperationList = gson.fromJson(jsonString, type)
             return op.operations
         }

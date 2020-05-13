@@ -19,8 +19,9 @@ class OperationController {
     private lateinit var operationTasks: List<OperationTask>
     private var operationResults = mutableListOf<OperationResult>()
 
-    val OPERATION_TIME: Long = 1000
+    private val OPERATION_TIME: Long = 1000
 
+    var totalTime = 0.0f
     var totalOperations = 0
     var indexOperation = 0
     var chassi: String? = ""
@@ -29,16 +30,19 @@ class OperationController {
     lateinit var currentOperationTask: OperationTask
 
     constructor(mView: Activity) : super() {
-        indexOperation = 0
-        totalOperations = 0
+        this.indexOperation = 0
+        this.totalOperations = 0
         this.mView = mView
-        this.chassi = mView.getIntent().getStringExtra("CHASSIS")
+        this.chassi = mView.intent.getStringExtra("CHASSIS")
     }
 
     constructor(mView: Activity, operations: List<OperationTask>) : this(mView) {
         this.operationTasks = operations
         this.totalOperations = operations.size
         this.currentOperationTask = operations[0]
+        this.operationTasks.map {
+            this.totalTime += it.time
+        }
     }
 
     fun updateOperation(callback: () -> Unit, status: Int, errorPicture: String? = null) {
