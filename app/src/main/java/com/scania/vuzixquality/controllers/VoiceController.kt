@@ -31,32 +31,34 @@ class VoiceController(activity: AppCompatActivity): BroadcastReceiver() {
         }
     }
 
-
     private fun registerPhrases() {
 
-        sc.insertWakeWordPhrase("hello")
+
         sc.insertWakeWordPhrase("start")
-        sc.insertWakeWordPhrase("vuzix")
 
-        // praaxymoo praaxymow saertow saertoo
-        // voow thar voo thar thees view
+//        sc.insertKeycodePhrase("okay", KeyEvent.KEYCODE_FORWARD_DEL)
+//        sc.insertKeycodePhrase("ok", KeyEvent.KEYCODE_FORWARD_DEL)
+//        sc.insertKeycodePhrase("all k", KeyEvent.KEYCODE_FORWARD_DEL)
+//        sc.insertKeycodePhrase("saertow", KeyEvent.KEYCODE_FORWARD_DEL)
+//        sc.insertKeycodePhrase("saertoo", KeyEvent.KEYCODE_FORWARD_DEL)
+//
+//        sc.insertKeycodePhrase("thees view", KeyEvent.KEYCODE_DEL)
+//        sc.insertKeycodePhrase("thees_view", KeyEvent.KEYCODE_DEL)
+//        sc.insertKeycodePhrase("theesview", KeyEvent.KEYCODE_DEL)
+//        sc.insertKeycodePhrase("this viel", KeyEvent.KEYCODE_DEL)
+//        sc.insertKeycodePhrase("thisviel", KeyEvent.KEYCODE_DEL)
 
-        sc.insertKeycodePhrase("okay", KeyEvent.KEYCODE_FORWARD_DEL)
-        sc.insertKeycodePhrase("praaxymoo", KeyEvent.KEYCODE_FORWARD_DEL)
-        sc.insertKeycodePhrase("praaxymow", KeyEvent.KEYCODE_FORWARD_DEL)
-        sc.insertKeycodePhrase("pro cmoe", KeyEvent.KEYCODE_FORWARD_DEL)
-        sc.insertKeycodePhrase("saertow", KeyEvent.KEYCODE_FORWARD_DEL)
-        sc.insertKeycodePhrase("saertoo", KeyEvent.KEYCODE_FORWARD_DEL)
+        sc.insertKeycodePhrase("okay", KeyEvent.KEYCODE_DPAD_RIGHT)
+        sc.insertKeycodePhrase("ok", KeyEvent.KEYCODE_DPAD_RIGHT)
+        sc.insertKeycodePhrase("all k", KeyEvent.KEYCODE_DPAD_RIGHT)
+        sc.insertKeycodePhrase("ceartoow", KeyEvent.KEYCODE_DPAD_RIGHT)
 
+        sc.insertKeycodePhrase("thees view", KeyEvent.KEYCODE_DPAD_LEFT)
+        sc.insertKeycodePhrase("thees_view", KeyEvent.KEYCODE_DPAD_LEFT)
+        sc.insertKeycodePhrase("theesview", KeyEvent.KEYCODE_DPAD_LEFT)
+        sc.insertKeycodePhrase("this viel", KeyEvent.KEYCODE_DPAD_LEFT)
+        sc.insertKeycodePhrase("thisviel", KeyEvent.KEYCODE_DPAD_LEFT)
 
-//        sc.insertKeycodePhrase("not okay", KeyEvent.KEYCODE_DEL)
-        sc.insertKeycodePhrase("thees view", KeyEvent.KEYCODE_DEL)
-        sc.insertKeycodePhrase("thees_view", KeyEvent.KEYCODE_DEL)
-        sc.insertKeycodePhrase("theesview", KeyEvent.KEYCODE_DEL)
-        sc.insertKeycodePhrase("this viel", KeyEvent.KEYCODE_DEL)
-        sc.insertKeycodePhrase("thisviel", KeyEvent.KEYCODE_DEL)
-
-        sc.insertKeycodePhrase("error", KeyEvent.KEYCODE_DEL)
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {

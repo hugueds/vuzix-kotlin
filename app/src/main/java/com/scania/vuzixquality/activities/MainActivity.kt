@@ -99,6 +99,13 @@ class MainActivity : AppCompatActivity() {
                     OperationLogger.submit(this, results, server)
             }
 
+            KeyEvent.KEYCODE_S -> {
+                if (event.action == KeyEvent.ACTION_UP) {
+                    val intent = Intent(this, SettingsActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+
             KeyEvent.KEYCODE_2 -> {
                 if (event.action == KeyEvent.ACTION_UP) {
                     val intent = Intent(this, CameraActivity::class.java)
@@ -116,6 +123,11 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, OperationActivity::class.java)
         intent.putExtra("CHASSIS", resultString)
         startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        voiceController.unregister()
+        super.onDestroy()
     }
 
 

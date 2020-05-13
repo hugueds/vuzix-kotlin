@@ -61,10 +61,10 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
         operationController = OperationController(this, operations)
 
         operationController.updateOperation(0, updateTasks)
-1
+        1
         text_chassi.text = operationController.chassi
 
-        val timer = object : CountDownTimer((totalTime * 1000).toLong() , 1000) {
+        val timer = object : CountDownTimer((totalTime * 1000).toLong(), 1000) {
 
             override fun onFinish() {
 
@@ -73,7 +73,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             override fun onTick(millisUntilFinished: Long) {
                 timeBar -= 10
                 if (timeBar > 0)
-                    progressBar.progress = ( (timeBar / totalTime) * 100).toInt()
+                    progressBar.progress = ((timeBar / totalTime) * 100).toInt()
                 else
                     progressBar.progress = 0
                 if (timeBar <= 30)
@@ -141,16 +141,11 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             KeyEvent.KEYCODE_DPAD_DOWN -> {
                 Log.i("KEY", "DOWN")
             }
-            KeyEvent.KEYCODE_DPAD_LEFT -> {
-                Log.i("KEY", "LEFT")
-            }
-            KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                Log.i("KEY", "RIGHT")
-            }
+
             KeyEvent.KEYCODE_DPAD_CENTER -> {
                 Log.i("KEY", "CENTER")
             }
-            KeyEvent.KEYCODE_DEL -> {
+            KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_DPAD_LEFT -> {
                 if (event.action == KeyEvent.ACTION_UP) {
                     this.animateBackground(Color.RED)
                     // Abrir a activity da foto
@@ -160,7 +155,7 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
 //                    operationController.updateOperation(updateTasks, 2)
                 }
             }
-            KeyEvent.KEYCODE_FORWARD_DEL -> {
+            KeyEvent.KEYCODE_FORWARD_DEL, KeyEvent.KEYCODE_DPAD_RIGHT -> {
                 if (event.action == KeyEvent.ACTION_UP) {
                     this.animateBackground(Color.GREEN)
                     operationController.updateOperation(updateTasks, 1)

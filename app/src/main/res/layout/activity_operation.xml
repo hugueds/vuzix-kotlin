@@ -73,18 +73,29 @@
             android:text="0/0"
             android:textAlignment="center"
             android:textColor="@color/yellow"
-            android:textSize="20sp" />
+            android:textSize="25sp"
+            tools:ignore="NestedWeights" />
 
 
         <TextView
             android:id="@+id/text_operation_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:text="INSPECIONAR OS PARANAUE DOS BREGUENAITES"
             android:textAlignment="center"
             android:textColor="@color/yellow"
-            android:textSize="24sp" />
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="13"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/yellow"
+            android:textSize="20sp"
+            tools:ignore="NestedWeights" />
 
     </LinearLayout>
 
