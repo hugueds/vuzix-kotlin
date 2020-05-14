@@ -8,23 +8,19 @@
     android:background="@drawable/main"
     tools:context=".activities.MainActivity">
 
-    <!--    <TextView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="50dp"-->
-    <!--        android:background="@color/black" />-->
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="25dp"
-        android:textColor="#FF0000"
-        android:text="PRESSIONE O BOTÃO POSTERIOR \nPARA LER CÓDIGO DE BARRAS \n DO VEICULO NO POSTO DE MONTAGEM"
-        android:textAlignment="center"
-        android:textSize="32sp"
-        android:visibility="invisible"
-        tools:ignore="HardcodedText" />
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_marginTop="25dp"-->
+<!--        android:text="PRESSIONE O BOTÃO POSTERIOR \nPARA LER CÓDIGO DE BARRAS \n DO VEICULO NO POSTO DE MONTAGEM"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textColor="#FF0000"-->
+<!--        -->
+<!--        android:visibility="invisible"-->
+<!--        tools:ignore="HardcodedText" />-->
 
     <Button
         android:id="@+id/button"
@@ -32,13 +28,13 @@
         android:layout_width="258dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginLeft="210dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginStart="210dp"
+        android:layout_marginTop="240dp"
         android:background="#707070"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:focusedByDefault="true"
-        android:text="LER CHASSI"
+        android:text="@string/ler_chassi"
         android:textAlignment="center"
         android:textSize="40sp" />
 
