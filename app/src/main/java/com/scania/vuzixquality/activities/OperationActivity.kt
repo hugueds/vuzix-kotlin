@@ -33,14 +33,14 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
     private var locked = false
     private val animationTime: Long = 750
     private lateinit var operationController: OperationController
-    private val mView = this
     private val REQUEST_IMAGE_CAPTURE = 1
-    lateinit var voiceController: VoiceController
-
+    private lateinit var voiceController: VoiceController
+    private val mView = this
     private var timeBar = 0
 
     // TODO Implement Voice Controller
     // TODO Enable buttons or not via config
+    // TODO Implement swipe for mobile apps
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -69,18 +69,17 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             override fun onTick(millisUntilFinished: Long) {
+                // Log.i("TIME",((timeBar / operationController.totalTime) * 100).toString() )
                 timeBar -= 1
                 if (timeBar > 0)
                     progressBar.progress = ((timeBar / operationController.totalTime) * 100).toInt()
                 else
                     progressBar.progress = 0
-                if (timeBar <= (0.3 * timeBar))
+                if (timeBar <= (0.4 * timeBar))
                     progressBar.progressTintList = ColorStateList.valueOf(Color.RED)
             }
         }
         timer.start()
-
-
     }
 
     // On Click, On Voice or On Key, add 1 to index and load the next picture
@@ -113,7 +112,6 @@ class OperationActivity : AppCompatActivity(), View.OnClickListener {
             button_notok.id -> {
                 Log.i("BUTTON", "BUTTON NOT OK PRESSED")
                 color = Color.RED
-
                 // Abrir um Alert perguntando se gostaria de tirar uma foto
 //                val builder = AlertDialog.Builder(this)
 //                builder.setTitle("MENSAGEM")

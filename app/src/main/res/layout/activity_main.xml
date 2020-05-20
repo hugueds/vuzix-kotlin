@@ -15,7 +15,7 @@
 <!--        android:layout_height="wrap_content"-->
 <!--        android:layout_gravity="center"-->
 <!--        android:layout_marginTop="25dp"-->
-<!--        android:text="PRESSIONE O BOTÃO POSTERIOR \nPARA LER CÓDIGO DE BARRAS \n DO VEICULO NO POSTO DE MONTAGEM"-->
+<!--        android:text="PRESSIONE O BOTÃO 'POSTERIOR \nPARA LER CÓDIGO DE BARRAS \n DO VEICULO NO POSTO DE MONTAGEM"-->
 <!--        android:textAlignment="center"-->
 <!--        android:textColor="#FF0000"-->
 <!--        -->

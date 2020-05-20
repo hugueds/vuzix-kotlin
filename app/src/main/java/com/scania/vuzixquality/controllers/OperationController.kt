@@ -26,6 +26,7 @@ class OperationController {
     var indexOperation = 0
     var chassi: String? = ""
     var locked = false
+    var isOnline = false // SETTINGS
 
     lateinit var currentOperationTask: OperationTask
 
@@ -96,7 +97,8 @@ class OperationController {
         val timer = object : CountDownTimer(OPERATION_TIME, OPERATION_TIME) {
 
             override fun onFinish() {
-                OperationLogger.save(operationResults, mView.applicationContext)
+                if (isOnline)
+                    OperationLogger.save(operationResults, mView.applicationContext)
                 mView.finish()
             }
 

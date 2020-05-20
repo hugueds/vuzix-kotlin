@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private val REQUEST_CODE_SCAN = 0
     private lateinit var voiceController: VoiceController
-    private val server = "http://10.33.22.113:8080" //"http://192.168.1.16:5000/"
+    private val server = "http://10.33.22.113:8080" //"http://192.168.1.16:5000/" // PUT IN SETTINGS
     private val DEVICE_TYPE = 0   // 0 -> Vuzix, 1 -> Emulator, 2 -> Mobile
 
 
@@ -34,9 +34,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-
-        voiceController =
-            VoiceController(this)
+        voiceController = VoiceController(this)
 
         button.setOnClickListener {
 
@@ -65,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                     Log.i("SCAN", "SCAN OK")
                     val resultString =
                         data?.getStringExtra(ScannerIntent.RESULT_EXTRA_BARCODE_TEXT)
-                    val test = true
+                    val test = true // ENABLE ONLY IN PRODUCTION
                     if (resultString != "" && resultString?.length == 7 || test)
                         navigate(resultString)
                     else
